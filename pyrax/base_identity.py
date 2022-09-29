@@ -628,8 +628,12 @@ class BaseIdentity(object):
         access = resp["access"]
         token = access.get("token")
         self.token = token["id"]
-        self.tenant_id = token["tenant"]["id"]
-        self.tenant_name = token["tenant"]["name"]
+        if token["tenant"] is not None:
+            self.tenant_id = access['serviceCatalog'][0]['endpoints'][0]['tenantId'].split(":")[-1]
+            self.tenant_name = access['serviceCatalog'][0]['name']
+        else:
+            self.tenant_id = token["tenant"]["id"]
+            self.tenant_name = token["tenant"]["name"]
         self.expires = self._parse_api_time(token["expires"])
         self.service_catalog = access.get("serviceCatalog")
         self._parse_service_catalog()
